@@ -1,16 +1,9 @@
 import feedparser
-import re
+import googlefinance
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
-
+import pandas as pd
+ 
 sid = SentimentIntensityAnalyzer()
-
-REPLACE_NO_SPACE = re.compile("[.;:!\'?,\"()\[\]]")
-REPLACE_WITH_SPACE = re.compile("(<br\s*/><br\s*/>)|(\-)|(\/)")
-
-def preprocess_reviews(reviews):
-    reviews = [REPLACE_NO_SPACE.sub("", line.lower()) for line in reviews]
-    reviews = [REPLACE_WITH_SPACE.sub(" ", line) for line in reviews]
-    return reviews
 
 NewsFeed = feedparser.parse("https://breakingthenews.net/news-feed.xml")
 
@@ -23,3 +16,4 @@ for x in range(0, len(NewsFeed.entries)):
     for k in sorted(ss):
         print('{0}: {1}, '.format(k, ss[k]), end='')
     print()
+
