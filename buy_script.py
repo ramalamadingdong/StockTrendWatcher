@@ -13,9 +13,10 @@ gainers = si.get_day_gainers()
 gainers.columns = ['SYM', 'Company', 'Current Price', 'Price Change', 'Percentage Change', 'Volume'	, 'Avg Vol', 'Market Cap', '52 Week Range']
 gainers.sort_values("Price Change", axis = 0, ascending = False, inplace = True)
 
+end = datetime.date.today()
+start = end - datetime.timedelta(days=200)
+stock_watchlist = []
 for stock in gainers['SYM']:
-    end = datetime.date.today()
-    start = end - datetime.timedelta(days=200)
 
     s_hist_data = si.get_data(stock , start_date = str(start) , end_date = str(end))
 
@@ -24,8 +25,15 @@ for stock in gainers['SYM']:
 
     curr_price = si.get_live_price(stock)
     if (avg < curr_price):
-        print(stock)
+        stock_watchlist.append(stock)
+data ={}
 
+for stock in stock_watchlist:
+    data[stock] = si.get_live_price(stock)
+
+today_stock_price = pd.DataFrame.from_dict(data, orient = 'index').T
+ 
+print(today_stock_price)
 
 '''
 sid = SentimentIntensityAnalyzer()
