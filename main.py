@@ -16,31 +16,8 @@ gainers.sort_values("Price Change", axis = 0, ascending = False, inplace = True)
 for stock in gainers['SYM']:
     end = datetime.date.today()
     start = end - datetime.timedelta(days=200)
-    end = str(int(time.mktime(end.timetuple())))
-    start = str(int(time.mktime(start.timetuple())))
 
-    url = 'https://finance.yahoo.com/quote/' + stock +'/history?period1=' + start +'&period2=' + end + '&interval=1d&filter=history&frequency=1d'
-    source = urllib.request.urlopen(url).read()
-
-    soup = bs.BeautifulSoup(source, features="html.parser")
-
-    table = soup.table
-    table_rows = table.find_all('tr')
-    rows = []
-
-    for tr in table_rows:
-        td = tr.find_all('td')
-        row = [i.text for i in td]
-        rows.append(row)
-    rows.pop(0)
-    rows.pop()
-    rows.pop()
-
-    s_hist_data = pd.DataFrame(rows)
-    s_hist_data.columns = ['Date', 'Open', 'High', 'Low', 'Close', 'Adjust Clsoe', 'Vol']
-
-    s_hist_data['High'] = s_hist_data ['High'].astype(float)
-    s_hist_data['Low']  = s_hist_data ['Low'].astype(float)
+    s_hist_data = si.get_data(stock , start_date = str(start) , end_date = str(end))
 
     var = s_hist_data.mean(axis=0, skipna = True)
     avg = (float(var[0]) + float(var[1]))/2
