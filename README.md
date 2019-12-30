@@ -1,15 +1,19 @@
 # StockTrendWatcher
- Stock Try #1 
 
+ Stock Try #1
 
 Step 1:
-  200 day avg < current price
-  stock in up trend
-  
+  200 day avg < current price ----> COMPLETE
+    Possible Improvments:
+      Get 200 day average instead of calculating it.
+  stock in up trend           ----> COMPLETE
+    Possible Improvments:
+      Actually get a good derivative pattern.
 Step 2:
-  BSE pattern
+  BSE pattern                 ----> IN PROGRESS
+    Possible Improvments:
   
-Step 3:
+Step 3:                       ----> Possible seperate process or Threading
   stop loss - ATR - 14
 Step 4:
   set target
