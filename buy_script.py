@@ -8,6 +8,11 @@ import urllib.request
 from yahoo_fin import stock_info as si
 import datetime
 import time
+import random
+import pandas_helper_calc
+
+
+debugmode = True
 
 gainers = si.get_day_gainers()
 gainers.columns = ['SYM', 'Company', 'Current Price', 'Price Change', 'Percentage Change', 'Volume'	, 'Avg Vol', 'Market Cap', '52 Week Range']
@@ -26,14 +31,31 @@ for stock in gainers['SYM']:
     curr_price = si.get_live_price(stock)
     if (avg < curr_price):
         stock_watchlist.append(stock)
-data ={}
 
-for stock in stock_watchlist:
-    data[stock] = si.get_live_price(stock)
+i =0
 
-today_stock_price = pd.DataFrame.from_dict(data, orient = 'index').T
- 
+# Creating an empty Dataframe with column names only
+today_stock_price = pd.DataFrame(columns=stock_watchlist)
+i = 0
+while i < 100:                  #possible threading?
+    if debugmode:
+        i+=1
+    if not (debugmode):
+        time.sleep(30)
+    data = {}
+    for stock in stock_watchlist:
+        if (debugmode):
+            data[stock] = random.randint(0, 100)
+        else:
+            data[stock] = si.get_live_price(stock)
+    today_stock_price = today_stock_price.append(data, ignore_index=True)
+
+    if (len(today_stock_price) > 50):
+        dy1dx = today_stock_price.calc.derivative()
+        var = dy1dx.mean(axis=0, skipna = True)
+
 print(today_stock_price)
+
 
 '''
 sid = SentimentIntensityAnalyzer()
