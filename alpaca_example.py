@@ -2,9 +2,13 @@ import alpaca_trade_api as tradeapi
 import threading
 import time
 import datetime
+from yahoo_fin import stock_info as si
 
-API_KEY = "YOUR_API_KEY_HERE"
-API_SECRET = "YOUR_API_SECRET_HERE"
+keys_file = open("keys.txt")
+lines = keys_file.readlines()
+
+API_KEY = lines[0].rstrip()
+API_SECRET = lines[1].rstrip()
 APCA_API_BASE_URL = "https://paper-api.alpaca.markets"
 
 
@@ -12,7 +16,28 @@ class LongShort:
   def __init__(self):
     self.alpaca = tradeapi.REST(API_KEY, API_SECRET, APCA_API_BASE_URL, 'v2')
 
-    stockUniverse = ['DOMO', 'TLRY', 'SQ', 'MRO', 'AAPL', 'GM', 'SNAP', 'SHOP', 'SPLK', 'BA', 'AMZN', 'SUI', 'SUN', 'TSLA', 'CGC', 'SPWR', 'NIO', 'CAT', 'MSFT', 'PANW', 'OKTA', 'TWTR', 'TM', 'RTN', 'ATVI', 'GS', 'BAC', 'MS', 'TWLO', 'QCOM', ]
+    gainers = si.get_day_gainers()
+    gainers.columns = ['SYM', 'Company', 'Current Price', 'Price Change', 'Percentage Change', 'Volume'	, 'Avg Vol', 'Market Cap', '52 Week Range']
+    gainers.sort_values("Price Change", axis = 0, ascending = False, inplace = True)
+
+    end = datetime.date.today()
+    start = end - datetime.timedelta(days=200)
+    stock_watchlist = []
+    for stock in gainers['SYM']:
+
+        s_hist_data = si.get_data(stock , start_date = str(start) , end_date = str(end))
+
+        var = s_hist_data.mean(axis=0, skipna = True)
+        avg = (float(var[0]) + float(var[1]))/2
+
+        curr_price = si.get_live_price(stock)
+        if (avg < curr_price):
+            stock_watchlist.append(stock)
+
+
+    stockUniverse = stock_watchlist
+    print("stock Universe for the day:", stockUniverse)
+    
     # Format the allStocks variable for use in the class.
     self.allStocks = []
     for stock in stockUniverse:
