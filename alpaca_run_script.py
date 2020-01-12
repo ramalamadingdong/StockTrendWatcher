@@ -11,7 +11,6 @@ API_KEY = lines[0].rstrip()
 API_SECRET = lines[1].rstrip()
 APCA_API_BASE_URL = "https://paper-api.alpaca.markets"
 
-
 class LongShort:
   def __init__(self):
     self.alpaca = tradeapi.REST(API_KEY, API_SECRET, APCA_API_BASE_URL, 'v2')
@@ -23,8 +22,8 @@ class LongShort:
     end = datetime.date.today()
     start = end - datetime.timedelta(days=200)
     stock_watchlist = []
-    for stock in gainers['SYM']:
 
+    for stock in gainers['SYM']:
         s_hist_data = si.get_data(stock , start_date = str(start) , end_date = str(end))
 
         var = s_hist_data.mean(axis=0, skipna = True)
@@ -34,9 +33,8 @@ class LongShort:
         if (avg < curr_price):
             stock_watchlist.append(stock)
 
-
     stockUniverse = stock_watchlist
-    print("stock Universe for the day:", stockUniverse)
+    print("Stock Universe for the day: ", stockUniverse)
     
     # Format the allStocks variable for use in the class.
     self.allStocks = []
