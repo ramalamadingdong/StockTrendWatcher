@@ -28,3 +28,5 @@ Step 3: The Stop Loss
 Step 4: The Price Target
 Step 5: The Reward-to-Risk
 https://www.investopedia.com/articles/active-trading/090415/only-take-trade-if-it-passes-5step-test.asp
+-------------------------------------
+alpaca.markets
