@@ -31,7 +31,9 @@ for stock in gainers['SYM']:
     curr_price = si.get_live_price(stock)
     if (avg < curr_price):
         stock_watchlist.append(stock)
-
+        
+print(stock_watchlist)
+'''
 i =0
 
 # Creating an empty Dataframe with column names only
@@ -56,6 +58,7 @@ while i < 100:                  #possible threading?
 
 print(today_stock_price)
 
+'''
 
 '''
 sid = SentimentIntensityAnalyzer()
