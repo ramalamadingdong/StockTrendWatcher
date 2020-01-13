@@ -1,0 +1,1 @@
+"<class 'datetime.date'>"["MELI", "SNX", "RARE", "RYAAY", "NKTR", "PEN", "IRTC", "NVCR", "QDEL", "TSN", "TXG", "TIGO", "KOD", "CSOD", "OCFT", "LEN", "RWEOY", "GSX", "LEN-B", "WFTLF", "APLS", "PBF", "SPCE", "MRNA", "ICAGY", "DRGDF", "LNVGY", "NG", "BLDP", "FQVLF", "PTXKY", "BTG", "BCLYF", "RNECY", "ALBKY"]
