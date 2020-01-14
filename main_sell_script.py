@@ -15,47 +15,42 @@ API_SECRET = lines[1].rstrip()
 APCA_API_BASE_URL = "https://paper-api.alpaca.markets"
 
 api = tradeapi.REST(API_KEY, API_SECRET, APCA_API_BASE_URL, 'v2')
-
 barTimeframe = "1Min"
 
-i=0
-while i<1:
-######## GET TODAYS GAINERS ########
-	i+=1
+while True:
+    
 	gainers = si.get_day_gainers()
 	gainers.columns = ['SYM', 'Company', 'Current Price', 'Price Change', 'Percentage Change', 'Volume'	, 'Avg Vol', 'Market Cap', '52 Week Range']
 	gainers.sort_values("Price Change", axis = 0, ascending = False, inplace = True)
 
 	end = datetime.date.today()
 	start = end - datetime.timedelta(days=200)
-
 	stock_watchlist = []
 	if not DEBUG_MODE:
 		for stock in gainers['SYM']:
 
-		    #s_hist_data = si.get_data(stock , start_date = str(start) , end_date = str(end))
+		    s_hist_data = si.get_data(stock , start_date = str(start) , end_date = str(end))
 
-		    #var = s_hist_data.mean(axis=0, skipna = True)
-		    #avg = (float(var[0]) + float(var[1]))/2
+		    var = s_hist_data.mean(axis=0, skipna = True)
+		    avg = (float(var[0]) + float(var[1]))/2
 
-		    #curr_price = si.get_live_price(stock)
-		    #if (avg < curr_price):
-			stock_watchlist.append(stock)
+		    curr_price = si.get_live_price(stock)
+		    if (avg < curr_price):
+		        stock_watchlist.append(stock)
 
-		assetsToTrade = stock_watchlist[0:4]
-		print(assetsToTrade)
+		assetsToTrade = stock_watchlist
 		print("Stock Universe for the day:", assetsToTrade)
 	else:
 		assetsToTrade = ["SPY","MSFT","AAPL","NFLX"]
-	
 	positionSizing = 1/len(assetsToTrade)
+
 	# Tracks position in list of symbols to download
 	iteratorPos = 0 
 	assetListLen = len(assetsToTrade)
 
-	returned_data = api.get_barset(assetsToTrade,barTimeframe,limit=100)
 	while iteratorPos < assetListLen:
 		symbol = assetsToTrade[iteratorPos]
+		returned_data = api.get_barset(symbol,barTimeframe,limit=100)
 		timeList = []
 		openList = []
 		highList = []
@@ -64,7 +59,9 @@ while i<1:
 		volumeList = []
 
 		# Reads, formats and stores the new bars
+		#print(returned_data[symbol][3].t)
 		for bar in returned_data[symbol]:
+			#print(bar)
 			timeList.append(bar.t)
 			openList.append(bar.o)
 			highList.append(bar.h)
@@ -84,24 +81,31 @@ while i<1:
 		try:
 			SMA20 = talib.SMA(closeList,20)[-1]
 		except:
-			iteratorPos += 1
 			continue
 		SMA50 = talib.SMA(closeList,50)[-1]
-		SMA3 = talib.SMA(closeList,3)[-1]
+
 
 		# Calculates the trading signals
 		if SMA20 > SMA50:
-			if SMA3 > 0:
-				try:
-					openPosition = api.get_position(symbol)
-				except:
-					price = si.get_live_price(symbol)
-					cashBalance = api.get_account().cash
-					targetPositionSize = float(str(cashBalance)) / (price / positionSizing) # Calculates required position size
-	
-					returned = api.submit_order(symbol,int(targetPositionSize),"buy","market","gtc") # Market order to open position
-					print(returned)
-		iteratorPos += 1
+			try:
+				openPosition = api.get_position(symbol)
+			except:
+				price = si.get_live_price(symbol)
+				cashBalance = api.get_account().cash
+	#			print(cashBalance.cash)
+				targetPositionSize = float(str(cashBalance)) / (price / positionSizing) # Calculates required position size
 
-	print("Waiting for 5 mins! Be patient")
-	time.sleep(60 * 5)
+				returned = api.submit_order(symbol,int(targetPositionSize),"buy","market","gtc") # Market order to open position
+				print(returned)
+
+		else:
+			# Closes position if SMA20 is below SMA50
+			try:
+				openPosition = api.get_position(symbol)
+
+				returned = api.submit_order(symbol,openPosition,"sell","market","gtc") # Market order to fully close position
+				print(returned)
+			except:
+				pass
+		iteratorPos += 1
+	time.sleep(60 * 5) 
