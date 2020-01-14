@@ -30,6 +30,7 @@ while i<1:
 	start = end - datetime.timedelta(days=200)
 	#print(gainers)
 	stock_watchlist = []
+	######## Do some Filtering on the best ones ########
 	if not DEBUG_MODE:
 		for stock in gainers['SYM']:
 		    #s_hist_data = si.get_data(stock , start_date = str(start) , end_date = str(end))
@@ -50,6 +51,7 @@ while i<1:
 	
 	iteratorPos = 0 	# Tracks position in list of symbols to download 
 	assetListLen = len(assetsToTrade)
+
 
 	returned_data = api.get_barset(assetsToTrade,barTimeframe,limit=100)
 	while iteratorPos < assetListLen:
