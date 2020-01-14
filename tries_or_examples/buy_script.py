@@ -11,7 +11,7 @@ import time
 import random
 import pandas_helper_calc
 
-
+'''
 debugmode = True
 
 gainers = si.get_day_gainers()
@@ -33,7 +33,8 @@ for stock in gainers['SYM']:
         stock_watchlist.append(stock)
         
 print(stock_watchlist)
-'''
+
+
 i =0
 
 # Creating an empty Dataframe with column names only
@@ -60,7 +61,7 @@ print(today_stock_price)
 
 '''
 
-'''
+
 sid = SentimentIntensityAnalyzer()
 
 NewsFeed = feedparser.parse("https://breakingthenews.net/news-feed.xml")
@@ -74,4 +75,3 @@ for x in range(0, len(NewsFeed.entries)):
     for k in sorted(ss):
         print('{0}: {1}, '.format(k, ss[k]), end='')
     print()
-'''

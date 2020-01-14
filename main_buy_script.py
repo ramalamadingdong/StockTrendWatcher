@@ -24,33 +24,31 @@ while i<1:
 	i+=1
 	gainers = si.get_day_gainers()
 	gainers.columns = ['SYM', 'Company', 'Current Price', 'Price Change', 'Percentage Change', 'Volume'	, 'Avg Vol', 'Market Cap', '52 Week Range']
-	gainers.sort_values("Price Change", axis = 0, ascending = False, inplace = True)
+	gainers.sort_values("Percentage Change", axis = 0, ascending = False, inplace = True)
 
 	end = datetime.date.today()
 	start = end - datetime.timedelta(days=200)
-
+	#print(gainers)
 	stock_watchlist = []
 	if not DEBUG_MODE:
 		for stock in gainers['SYM']:
-
 		    #s_hist_data = si.get_data(stock , start_date = str(start) , end_date = str(end))
 
 		    #var = s_hist_data.mean(axis=0, skipna = True)
 		    #avg = (float(var[0]) + float(var[1]))/2
 
 		    #curr_price = si.get_live_price(stock)
-		    #if (avg < curr_price):
+		    #if (avg < curr_price):	
 			stock_watchlist.append(stock)
-
-		assetsToTrade = stock_watchlist[0:4]
+		assetsToTrade = stock_watchlist[0:8]
 		print(assetsToTrade)
 		print("Stock Universe for the day:", assetsToTrade)
 	else:
 		assetsToTrade = ["SPY","MSFT","AAPL","NFLX"]
 	
 	positionSizing = 1/len(assetsToTrade)
-	# Tracks position in list of symbols to download
-	iteratorPos = 0 
+	
+	iteratorPos = 0 	# Tracks position in list of symbols to download 
 	assetListLen = len(assetsToTrade)
 
 	returned_data = api.get_barset(assetsToTrade,barTimeframe,limit=100)
@@ -103,5 +101,5 @@ while i<1:
 					print(returned)
 		iteratorPos += 1
 
-	print("Waiting for 5 mins! Be patient")
-	time.sleep(60 * 5)
+	print("Waiting for 0 mins! Be patient")
+	time.sleep(60 * 0)
