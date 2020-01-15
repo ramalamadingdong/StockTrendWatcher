@@ -20,7 +20,13 @@ i=0
 while i < 1:
     i+=1
     positions = api.list_positions()
-    print(positions)
+
+    for stock in positions:
+        if stock.avg_entry_price > stock.current_price:
+            #mark to sell.
+            
+
+    
     if False:
         try:
             openPosition = api.get_position(symbol)
