@@ -23,18 +23,12 @@ while i < 1:
 
     for stock in positions:
         if stock.avg_entry_price > stock.current_price:
-            #mark to sell.
-            
-
-    
-    if False:
-        try:
-            openPosition = api.get_position(symbol)
-
-            returned = api.submit_order(symbol,openPosition,"sell","market","gtc") # Market order to fully close position
-            print(returned)
-        except:
-            pass
+            try:
+                openPosition = api.get_position(symbol)
+                returned = api.submit_order(symbol,openPosition,"sell","market","gtc") # Market order to fully close position
+                print(returned)
+            except:
+                pass
 
     print("Waiting for 0 mins! Be patient")
     time.sleep(60 * 0)

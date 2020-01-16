@@ -31,7 +31,7 @@ def awaitMarketOpen():
 		isOpen = self.alpaca.get_clock().is_open
 
 while True:
-	#awaitMarketOpen()
+	awaitMarketOpen()
 ######## GET TODAYS GAINERS ########
 
 	gainers = si.get_day_gainers()
@@ -105,8 +105,8 @@ while True:
 	
 					returned = api.submit_order(symbol,int(targetPositionSize),"buy","market","gtc") # Market order to open position
 					print(returned)
-					f.write(returned.symbol, datetime.datetime.time())
-					print(returned.symbol, datetime.datetime.time())
+					f.write(str(returned.symbol) + str(datetime.time()))
+					print(str(returned.symbol) + str(datetime.time()))
 		iteratorPos += 1
 	positions = api.list_positions()
 
