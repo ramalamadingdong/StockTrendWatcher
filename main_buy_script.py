@@ -5,7 +5,6 @@ import alpaca_trade_api as tradeapi
 from yahoo_fin import stock_info as si
 import time
 
-
 keys_file = open("keys.txt")
 lines = keys_file.readlines()
 
@@ -42,10 +41,12 @@ while True:
 	start = end - datetime.timedelta(days=200)
 
 	stock_watchlist = []
+
 	######## Do some Filtering on the best ones ########
 
 	for stock in gainers['SYM']:
 		stock_watchlist.append(stock)
+
 	assetsToTrade = stock_watchlist[0:8]
 	print(assetsToTrade)
 	print("Stock Universe for the day:", assetsToTrade)
@@ -86,13 +87,17 @@ while True:
 		# Calculated trading indicators
 		try:
 			SMA20 = talib.SMA(closeList,20)[-1]
+
 		except:
 			iteratorPos += 1
 			print("stock doesn't exist on Alpaca don't worry about it.")
 			continue
 		SMA50 = talib.SMA(closeList,50)[-1]
 		SMA3 = talib.SMA(closeList,3)[-1]
+		xxxx = talib.KAMA(openList)[-1]
+		print(xxxx)
 
+		#print(SMA20)
 		# Calculates the trading signals
 		if SMA20 > SMA50:
 			if SMA3 > 0:
@@ -102,17 +107,19 @@ while True:
 					price = si.get_live_price(symbol)
 					cashBalance = api.get_account().cash
 					targetPositionSize = float(str(cashBalance)) / (price / positionSizing) # Calculates required position size
-	
-					returned = api.submit_order(symbol,int(targetPositionSize),"buy","market","gtc") # Market order to open position
-					print(returned)
-					f.write(str(returned.symbol) + str(datetime.time()))
-					print(str(returned.symbol) + str(datetime.time()))
+
+						# returned = api.submit_order(symbol,int(targetPositionSize),"buy","market","gtc") # Market order to open position
+						# print(returned)
+						# f.write(str(returned.symbol) + ' ' + str(datetime.date.today() + '\n')
+						# print(str(returned.symbol) + ' ' + str(datetime.date.today() + '\n')
 		iteratorPos += 1
 	positions = api.list_positions()
 
 	if(len(positions) > 5):
 		print("Waiting for 24 hours! Be patient")	
-		time.sleep(60 * 24 * 60)	
-	print("Waiting for 5 mins! Be patient")
-	time.sleep(60 * 5)
+		time.sleep(60 * 24 * 60)
+	else:	
+		print("Waiting for 5 mins! Be patient")
+		time.sleep(60 * 5)
+		assetsToTrade = stock_watchlist[8:]
 
