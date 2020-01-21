@@ -16,11 +16,30 @@ APCA_API_BASE_URL = "https://paper-api.alpaca.markets"
 
 api = tradeapi.REST(API_KEY, API_SECRET, APCA_API_BASE_URL, 'v2')
 barTimeframe = "1Min"
+
+start_of_day = True
+
+def awaitMarketOpen():
+	isOpen = api.get_clock().is_open
+	while(not isOpen):
+        start_of_day = False
+		clock = api.get_clock()
+		openingTime = clock.next_open.replace(tzinfo=datetime.timezone.utc).timestamp()
+		currTime = clock.timestamp.replace(tzinfo=datetime.timezone.utc).timestamp()
+		timeToOpen = int((openingTime - currTime) / 60)
+		print(str(timeToOpen) + " minutes til market open.")
+		time.sleep(60)
+		isOpen = self.alpaca.get_clock().is_open
+
 i=0
-while i < 1:
+while True:
+    awaitMarketOpen()
+    if start_of_day:
+        print("Sell alll stuff not positive")
+        start_of_day = True
     i+=1
     positions = api.list_positions()
-
+    # account = 
     for stock in positions:
         if stock.avg_entry_price > stock.current_price:
             try:

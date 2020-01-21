@@ -14,7 +14,8 @@ APCA_API_BASE_URL = "https://paper-api.alpaca.markets"
 
 api = tradeapi.REST(API_KEY, API_SECRET, APCA_API_BASE_URL, 'v2')
 
-barTimeframe = "1Min"
+minFrame = "1Min"
+dayFrame = "1Day"
 
 f = open("log.txt","w+")
 
@@ -47,7 +48,7 @@ while True:
 	for stock in gainers['SYM']:
 		stock_watchlist.append(stock)
 
-	assetsToTrade = stock_watchlist[0:8]
+	assetsToTrade = stock_watchlist
 	print(assetsToTrade)
 	print("Stock Universe for the day:", assetsToTrade)
 	
@@ -56,7 +57,7 @@ while True:
 	iteratorPos = 0
 	assetListLen = len(assetsToTrade)
 
-	returned_data = api.get_barset(assetsToTrade, barTimeframe, limit=100)
+	returned_data = api.get_barset(assetsToTrade, minFrame, limit=100)
 
 	while iteratorPos < assetListLen:
 		symbol = assetsToTrade[iteratorPos]
@@ -94,32 +95,31 @@ while True:
 			continue
 		SMA50 = talib.SMA(closeList,50)[-1]
 		SMA3 = talib.SMA(closeList,3)[-1]
-		xxxx = talib.KAMA(openList)[-1]
-		print(xxxx)
+		KAMA = talib.KAMA(openList)[-1]
+		print(KAMA)
 
-		#print(SMA20)
 		# Calculates the trading signals
-		if SMA20 > SMA50:
-			if SMA3 > 0:
-				try:
-					openPosition = api.get_position(symbol)
-				except:
-					price = si.get_live_price(symbol)
-					cashBalance = api.get_account().cash
-					targetPositionSize = float(str(cashBalance)) / (price / positionSizing) # Calculates required position size
+		if SMA20 > SMA50 and SMA3 > 0 and KAMA>50:
+			try:
+				openPosition = api.get_position(symbol)
+			except:
+				price = si.get_live_price(symbol)
+				cashBalance = api.get_account().cash
+				targetPositionSize = float(str(cashBalance)) / (price / positionSizing) # Calculates required position size
 
-						# returned = api.submit_order(symbol,int(targetPositionSize),"buy","market","gtc") # Market order to open position
-						# print(returned)
-						# f.write(str(returned.symbol) + ' ' + str(datetime.date.today() + '\n')
-						# print(str(returned.symbol) + ' ' + str(datetime.date.today() + '\n')
+				returned = api.submit_order(symbol,int(targetPositionSize),"buy","market","gtc") # Market order to open position
+				print(returned)
+				f.write(str(returned.symbol) + ' ' + str(datetime.date.today()) + '\n')
+				print(str(returned.symbol) + ' ' + str(datetime.date.today()) + '\n')
+		else:
+			print("decided not to buy: " + symbol + " It didn't meet the requirments today")
 		iteratorPos += 1
 	positions = api.list_positions()
 
 	if(len(positions) > 5):
-		print("Waiting for 24 hours! Be patient")	
+		print("Waiting for 24 hours! already have more than 5 positions today!")	
 		time.sleep(60 * 24 * 60)
 	else:	
-		print("Waiting for 5 mins! Be patient")
+		print("Waiting for 1 mins! Then check the rest of possible stocks")
 		time.sleep(60 * 5)
-		assetsToTrade = stock_watchlist[8:]
 
