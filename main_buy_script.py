@@ -15,7 +15,7 @@ APCA_API_BASE_URL = "https://paper-api.alpaca.markets"
 api = tradeapi.REST(API_KEY, API_SECRET, APCA_API_BASE_URL, 'v2')
 
 minFrame = "1Min"
-dayFrame = "1Day"
+dayFrame = "day"
 
 f = open("log.txt","w+")
 
@@ -29,6 +29,10 @@ def awaitMarketOpen():
 		print(str(timeToOpen) + " minutes til market open.")
 		time.sleep(60)
 		isOpen = self.alpaca.get_clock().is_open
+def divergence(F):
+    """ compute the divergence of n-D scalar field `F` """
+    return reduce(np.add,np.gradient(F))
+
 
 while True:
 	awaitMarketOpen()
@@ -57,7 +61,9 @@ while True:
 	iteratorPos = 0
 	assetListLen = len(assetsToTrade)
 
-	returned_data = api.get_barset(assetsToTrade, minFrame, limit=100)
+	returned_data_daily = api.get_barset(assetsToTrade, dayFrame, limit=100)
+	returned_data_min = api.get_barset(assetsToTrade, minFrame, limit=100)
+
 
 	while iteratorPos < assetListLen:
 		symbol = assetsToTrade[iteratorPos]
@@ -69,7 +75,7 @@ while True:
 		volumeList = []
 
 		# Reads, formats and stores the new bars
-		for bar in returned_data[symbol]:
+		for bar in returned_data_min[symbol]:
 			timeList.append(bar.t)
 			openList.append(bar.o)
 			highList.append(bar.h)
@@ -96,27 +102,31 @@ while True:
 		SMA50 = talib.SMA(closeList,50)[-1]
 		SMA3 = talib.SMA(closeList,3)[-1]
 		KAMA = talib.KAMA(openList)[-1]
-		print(KAMA)
-
+		#test = talib.RSI(closeList, timeperiod=14)
+		#print("new test", test)
 		# Calculates the trading signals
 		if SMA20 > SMA50 and SMA3 > 0 and KAMA>50:
+			continue
 			try:
 				openPosition = api.get_position(symbol)
 			except:
 				price = si.get_live_price(symbol)
 				cashBalance = api.get_account().cash
 				targetPositionSize = float(str(cashBalance)) / (price / positionSizing) # Calculates required position size
-
-				returned = api.submit_order(symbol,int(targetPositionSize),"buy","market","gtc") # Market order to open position
-				print(returned)
-				f.write(str(returned.symbol) + ' ' + str(datetime.date.today()) + '\n')
-				print(str(returned.symbol) + ' ' + str(datetime.date.today()) + '\n')
+				# For now just buy 1
+				if float(str(cashBalance)) > float (price):
+					returned = api.submit_order(symbol, 1 ,"buy","market","gtc") # Market order to open position
+					print(returned)
+					f.write(str(returned.symbol) + ' ' + str(datetime.date.today()) + '\n')
+					print(str(returned.symbol) + ' ' + str(datetime.date.today()) + '\n')
+				else:
+					print("You poor bastard go away.")
 		else:
 			print("decided not to buy: " + symbol + " It didn't meet the requirments today")
 		iteratorPos += 1
 	positions = api.list_positions()
 
-	if(len(positions) > 5):
+	if(len(positions) > 5) or float(str(cashBalance)) < float(100):
 		print("Waiting for 24 hours! already have more than 5 positions today!")	
 		time.sleep(60 * 24 * 60)
 	else:	
