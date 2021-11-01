@@ -6,7 +6,6 @@ import feedparser
 import nltk
 import numpy as np
 import pandas as pd
-import pandas_helper_calc
 import requests
 import talib
 from fuzzywuzzy import process
