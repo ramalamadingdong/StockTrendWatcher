@@ -57,6 +57,8 @@ while True:
         ss = sid.polarity_scores(entry.title)
         if ss['compound'] > 0.5:
             for word in (entry.title).split():
+                if len(word) <= 1:
+                    continue
                 ticker = ''
                 ticker = getCompany(word)['symbol']
                 if ticker != '':
