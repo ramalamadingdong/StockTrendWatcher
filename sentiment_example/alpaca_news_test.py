@@ -63,12 +63,12 @@ while True:
                 if ticker != '':
                     print(ticker)
                     break
-            print("BUY", entry.title)
-            print(ss['compound'])
-
-            returned = api.submit_order(symbol,int(5),"buy","market","gtc") # Market order to open position
-            print(returned)
-            print(str(returned.symbol) + ' ' + str(datetime.date.today()) + '\n')
+            if ticker != '':
+                print("BUY", entry.title)
+                print(ss['compound'])
+                returned = api.submit_order(ticker,int(5),"buy","market","gtc") # Market order to open position
+                print(returned)
+                print(str(returned.symbol) + ' ' + str(datetime.date.today()) + '\n')
             
         if ss['compound'] < 0.5:
             print("SELL", entry.title)
