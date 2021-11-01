@@ -72,6 +72,8 @@ for x in range(0, len(NewsFeed.entries)):
     entry = NewsFeed.entries[x]
     print(entry.title)
     ss = sid.polarity_scores(entry.title)
+    for word in (entry.title).split():
+        print(word)
     for k in sorted(ss):
         print('{0}: {1}, '.format(k, ss[k]), end='')
     print()

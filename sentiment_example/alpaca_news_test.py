@@ -56,7 +56,7 @@ while True:
         entry = NewsFeed.entries[x]
         ss = sid.polarity_scores(entry.title)
         if ss['compound'] > 0.5:
-            for word in entry.title:
+            for word in (entry.title).split():
                 ticker = ''
                 ticker = getCompany(word)['symbol']
                 if ticker != '':
