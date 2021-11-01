@@ -28,7 +28,7 @@ def awaitMarketOpen():
 		timeToOpen = int((openingTime - currTime) / 60)
 		print(str(timeToOpen) + " minutes til market open.")
 		time.sleep(60)
-		isOpen = self.alpaca.get_clock().is_open
+		isOpen = api.get_clock().is_open
 
 while True:
 	awaitMarketOpen()
